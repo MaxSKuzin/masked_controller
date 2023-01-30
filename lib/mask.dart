@@ -1,12 +1,10 @@
-import 'package:meta/meta.dart';
-
 abstract class BaseMask {
-  String applyMaskTo({@required String string});
-  String removeMaskFrom({@required String string});
+  String? applyMaskTo({required String? string});
+  String? removeMaskFrom({required String? string});
 }
 
 class Mask extends BaseMask {
-  Mask({@required this.mask});
+  Mask({required this.mask});
 
   final String mask;
   final String _letterSymbol = 'A';
@@ -15,14 +13,11 @@ class Mask extends BaseMask {
   final RegExp _onlyLetterRegex = RegExp(r'[a-zA-Z]');
   final RegExp _onlyNumbersRegex = RegExp(r'[0-9]');
 
-  bool _isValidLetter({@required String character}) {
-    if (character == null) return null;
-
+  bool _isValidLetter({required String character}) {
     return character.contains(_onlyLetterRegex);
   }
 
-  bool _isValidNumber({@required String character}) {
-    if (character == null) return null;
+  bool _isValidNumber({required String character}) {
     try {
       return character.contains(_onlyNumbersRegex);
     } on FormatException catch (_) {
@@ -30,13 +25,12 @@ class Mask extends BaseMask {
     }
   }
 
-  bool _isValidAlphanumeric({@required String character}) {
-    return _isValidLetter(character: character) ||
-        _isValidNumber(character: character);
+  bool _isValidAlphanumeric({required String character}) {
+    return _isValidLetter(character: character) || _isValidNumber(character: character);
   }
 
   @override
-  String applyMaskTo({String string}) {
+  String? applyMaskTo({required String? string}) {
     if (string == null) return null;
 
     if (string.length > mask.length) return null;
@@ -54,22 +48,16 @@ class Mask extends BaseMask {
         if (character == maskSymbol) {
           formatedValue += character;
         } else {
-          while (maskSymbol != _letterSymbol &&
-              maskSymbol != _numberSymbol &&
-              maskSymbol != _alphanumericSymbol) {
+          while (maskSymbol != _letterSymbol && maskSymbol != _numberSymbol && maskSymbol != _alphanumericSymbol) {
             formatedValue += maskSymbol;
             maskSymbol = mask[++maskIndex];
           }
 
-          final isValidLetter = maskSymbol == _letterSymbol &&
-              _isValidLetter(character: character);
-          final isValidNumber = maskSymbol == _numberSymbol &&
-              _isValidNumber(character: character);
-          final isValidAlphanumeric = maskSymbol == _alphanumericSymbol &&
-              _isValidAlphanumeric(character: character);
+          final isValidLetter = maskSymbol == _letterSymbol && _isValidLetter(character: character);
+          final isValidNumber = maskSymbol == _numberSymbol && _isValidNumber(character: character);
+          final isValidAlphanumeric = maskSymbol == _alphanumericSymbol && _isValidAlphanumeric(character: character);
 
-          if (!isValidLetter && !isValidNumber && !isValidAlphanumeric)
-            return null;
+          if (!isValidLetter && !isValidNumber && !isValidAlphanumeric) return null;
 
           formatedValue += character;
         }
@@ -84,14 +72,13 @@ class Mask extends BaseMask {
   }
 
   @override
-  String removeMaskFrom({String string}) {
+  String? removeMaskFrom({required String? string}) {
     if (string == null) return null;
 
     String clearText = "";
     for (int count = 0; count < string.length; count++) {
       final String character = string[count];
-      if (_isValidNumber(character: character) ||
-          _isValidLetter(character: character)) {
+      if (_isValidNumber(character: character) || _isValidLetter(character: character)) {
         clearText += character;
       }
     }
@@ -100,8 +87,7 @@ class Mask extends BaseMask {
 
   @override
   bool operator ==(Object other) {
-    return identical(this, other) ||
-        other is Mask && runtimeType == other.runtimeType && mask == other.mask;
+    return identical(this, other) || other is Mask && runtimeType == other.runtimeType && mask == other.mask;
   }
 
   @override
